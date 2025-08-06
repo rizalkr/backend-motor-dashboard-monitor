@@ -1,0 +1,32 @@
+# Vercel ignore - files not needed in deployment
+
+# Local environment and secrets
+.env
+.env.local
+.env.*.local
+
+# Development files
+node_modules
+.git
+.gitignore
+
+# Documentation (optional - remove if you want docs in deployment)
+README.md
+CONTRIBUTING.md
+VERCEL_DEPLOYMENT.md
+
+# Database scripts (not needed in production)
+setup-database.sh
+database_schema.sql
+migrate-db.js
+test-db-connection.js
+check-db.js
+
+# Development tools
+.vscode
+.idea
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db

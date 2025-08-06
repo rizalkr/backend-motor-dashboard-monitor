@@ -3,25 +3,29 @@ require('dotenv').config();
 
 // Create PostgreSQL connection pool
 // Support both connection URL (for cloud databases like Neon) and individual parameters
-const pool = new Pool(
-  process.env.DB_URL ? {
-    connectionString: process.env.DB_URL,
-    ssl: {
-      rejectUnauthorized: false // Required for Neon and other cloud PostgreSQL providers
-    }
-  } : {
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
-    database: process.env.DB_NAME,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-  },
-  {
-    max: 20, // Maximum number of clients in the pool
-    idleTimeoutMillis: 30000, // Close idle clients after 30 seconds
-    connectionTimeoutMillis: 10000, // Increase timeout for cloud databases
+const poolConfig = process.env.DB_URL ? {
+  connectionString: process.env.DB_URL,
+  ssl: {
+    rejectUnauthorized: false // Required for Neon and other cloud PostgreSQL providers
   }
-);
+} : {
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  database: process.env.DB_NAME,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+};
+
+// Optimize connection pool for serverless/Vercel
+const connectionPoolConfig = {
+  max: process.env.VERCEL ? 1 : 20, // Limit connections in serverless
+  idleTimeoutMillis: 30000, // Close idle clients after 30 seconds
+  connectionTimeoutMillis: 10000, // Increase timeout for cloud databases
+  statement_timeout: 30000, // 30 second statement timeout
+  query_timeout: 30000, // 30 second query timeout
+};
+
+const pool = new Pool({ ...poolConfig, ...connectionPoolConfig });
 
 // Test database connection
 pool.on('connect', () => {

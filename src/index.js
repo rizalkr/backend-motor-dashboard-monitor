@@ -135,12 +135,14 @@ process.on('SIGTERM', async () => {
   process.exit(0);
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(` Vehicle Maintenance API Server running on port ${PORT}`);
-  console.log(`📚 API Documentation available at http://localhost:${PORT}/`);
-  console.log(`🏥 Health check available at http://localhost:${PORT}/health`);
-  console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
-});
+// Start server only if not running in Vercel (serverless environment)
+if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`🚀 Vehicle Maintenance API Server running on port ${PORT}`);
+    console.log(`📚 API Documentation available at http://localhost:${PORT}/`);
+    console.log(`🏥 Health check available at http://localhost:${PORT}/health`);
+    console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+  });
+}
 
 module.exports = app;
