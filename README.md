@@ -1,5 +1,7 @@
 # Vehicle Maintenance Tracking API
 
+[![CI/CD Pipeline](https://github.com/rizalkr/backend-motor-dashboard-monitor/actions/workflows/ci.yml/badge.svg)](https://github.com/rizalkr/backend-motor-dashboard-monitor/actions/workflows/ci.yml)
+
 A secure, multi-tenant backend service for tracking vehicle maintenance records, oil changes, and fuel consumption. Built with Node.js, Express.js, and PostgreSQL.
 
 ## Features
@@ -58,10 +60,11 @@ A secure, multi-tenant backend service for tracking vehicle maintenance records,
 - PostgreSQL (v12 or higher)
 - npm or yarn
 
-### 1. Clone and Install Dependencies
+### 1. Clone the Repository
 
 ```bash
-cd dashboard-motor
+git clone git@github.com:rizalkr/backend-motor-dashboard-monitor.git
+cd backend-motor-dashboard-monitor
 npm install
 ```
 
