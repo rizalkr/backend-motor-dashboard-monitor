@@ -137,7 +137,7 @@ process.on('SIGTERM', async () => {
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`🚀 Vehicle Maintenance API Server running on port ${PORT}`);
+  console.log(` Vehicle Maintenance API Server running on port ${PORT}`);
   console.log(`📚 API Documentation available at http://localhost:${PORT}/`);
   console.log(`🏥 Health check available at http://localhost:${PORT}/health`);
   console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);

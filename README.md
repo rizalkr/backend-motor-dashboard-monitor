@@ -67,14 +67,43 @@ npm install
 
 ### 2. Database Setup
 
+#### Option A: Automated Setup (Recommended)
+```bash
+# 1. First, ensure PostgreSQL is installed and running
+sudo systemctl start postgresql  # On Linux
+brew services start postgresql   # On macOS
+
+# 2. Configure your .env file with database credentials
+cp .env.example .env  # Then edit .env with your settings
+
+# 3. Run the automated setup script
+./setup-database.sh
+```
+
+#### Option B: Manual Setup
 1. Create a PostgreSQL database:
 ```sql
+sudo -u postgres psql
 CREATE DATABASE vehicle_maintenance;
+CREATE USER your_db_user WITH PASSWORD 'your_password';
+GRANT ALL PRIVILEGES ON DATABASE vehicle_maintenance TO your_db_user;
+\q
 ```
 
 2. Run the database schema:
 ```bash
-psql -U your_username -d vehicle_maintenance -f database_schema.sql
+psql -U your_db_user -d vehicle_maintenance -f database_schema.sql
+```
+
+### 3. Database Status Check
+
+Check if your database is ready:
+```bash
+# Quick status check
+npm run check-db
+
+# Detailed connection test
+npm run test-db
 ```
 
 ### 3. Environment Configuration
@@ -278,3 +307,86 @@ To contribute to this project:
 ## License
 
 MIT License - see LICENSE file for details.
+
+## Troubleshooting Database Issues
+
+### Common Database Connection Problems
+
+#### 1. "password authentication failed"
+```bash
+# Check PostgreSQL user exists and has correct password
+sudo -u postgres psql
+\du  # List all users
+ALTER USER your_db_user WITH PASSWORD 'new_password';
+```
+
+#### 2. "database does not exist"
+```bash
+# Create the database
+sudo -u postgres createdb vehicle_maintenance
+# Or grant createdb permission to your user
+sudo -u postgres psql
+ALTER USER your_db_user CREATEDB;
+```
+
+#### 3. "connection refused" / PostgreSQL not running
+```bash
+# On Ubuntu/Debian
+sudo systemctl status postgresql
+sudo systemctl start postgresql
+
+# On macOS with Homebrew
+brew services list | grep postgresql
+brew services start postgresql
+
+# On Windows
+# Use Services manager or PostgreSQL installer tools
+```
+
+#### 4. Check PostgreSQL configuration
+```bash
+# Find PostgreSQL config files
+sudo -u postgres psql -c "SHOW config_file;"
+
+# Common locations:
+# Ubuntu: /etc/postgresql/*/main/postgresql.conf
+# macOS: /usr/local/var/postgres/postgresql.conf
+```
+
+### Database Verification Commands
+
+```bash
+# Check if PostgreSQL is running
+ps aux | grep postgres
+
+# Test connection manually
+psql -h localhost -U your_db_user -d vehicle_maintenance -c "SELECT version();"
+
+# List all databases
+psql -h localhost -U your_db_user -l
+
+# Quick API health check
+curl http://localhost:3000/health
+```
+
+### Environment Variables Checklist
+
+Make sure your `.env` file contains:
+```env
+DB_HOST=localhost          # PostgreSQL host
+DB_PORT=5432              # PostgreSQL port (default: 5432)
+DB_NAME=vehicle_maintenance # Database name
+DB_USER=your_db_user      # PostgreSQL username
+DB_PASSWORD=your_password  # PostgreSQL password
+JWT_SECRET=your_secret_key # Strong secret for JWT tokens
+```
+
+### Scripts Available
+
+| Command | Description |
+|---------|-------------|
+| `npm run check-db` | Quick database status check |
+| `npm run test-db` | Detailed database connection test |
+| `./setup-database.sh` | Automated database setup |
+| `npm run setup-db` | Run schema SQL file |
+```
