@@ -2,16 +2,26 @@ const { Pool } = require('pg');
 require('dotenv').config();
 
 // Create PostgreSQL connection pool
-const pool = new Pool({
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
-  database: process.env.DB_NAME,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  max: 20, // Maximum number of clients in the pool
-  idleTimeoutMillis: 30000, // Close idle clients after 30 seconds
-  connectionTimeoutMillis: 2000, // Return an error after 2 seconds if connection could not be established
-});
+// Support both connection URL (for cloud databases like Neon) and individual parameters
+const pool = new Pool(
+  process.env.DB_URL ? {
+    connectionString: process.env.DB_URL,
+    ssl: {
+      rejectUnauthorized: false // Required for Neon and other cloud PostgreSQL providers
+    }
+  } : {
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    database: process.env.DB_NAME,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+  },
+  {
+    max: 20, // Maximum number of clients in the pool
+    idleTimeoutMillis: 30000, // Close idle clients after 30 seconds
+    connectionTimeoutMillis: 10000, // Increase timeout for cloud databases
+  }
+);
 
 // Test database connection
 pool.on('connect', () => {

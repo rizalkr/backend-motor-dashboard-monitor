@@ -8,14 +8,23 @@
 const { Pool } = require('pg');
 require('dotenv').config();
 
-const pool = new Pool({
-  host: process.env.DB_HOST || 'localhost',
-  port: process.env.DB_PORT || 5432,
-  database: process.env.DB_NAME || 'vehicle_maintenance',
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  connectionTimeoutMillis: 5000, // 5 second timeout
-});
+// Configure database connection - prioritize DB_URL for cloud databases like Neon
+const dbConfig = process.env.DB_URL 
+  ? { 
+      connectionString: process.env.DB_URL,
+      ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+      connectionTimeoutMillis: 10000,
+    }
+  : {
+      host: process.env.DB_HOST || 'localhost',
+      port: process.env.DB_PORT || 5432,
+      database: process.env.DB_NAME || 'vehicle_maintenance',
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+      connectionTimeoutMillis: 5000,
+    };
+
+const pool = new Pool(dbConfig);
 
 async function testDatabaseConnection() {
   console.log('🔍 Testing database connection...\n');

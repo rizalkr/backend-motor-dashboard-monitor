@@ -9,6 +9,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "test-db": "node test-db-connection.js",
     "check-db": "node check-db.js",
+    "migrate": "node migrate-db.js",
     "setup-db": "psql -U $DB_USER -d $DB_NAME -f database_schema.sql"
   },
   "keywords": [
