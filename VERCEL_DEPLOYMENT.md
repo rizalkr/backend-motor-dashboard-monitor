@@ -49,23 +49,109 @@ module.exports = app;
 
 ## 🌍 Environment Variables Setup
 
-### Required Environment Variables in Vercel:
+### ⚠️ CRITICAL: Configure Environment Variables in Vercel
+
+**This is the most common cause of deployment failures. Follow these steps carefully:**
+
+### Required Environment Variables:
 
 1. **Go to Vercel Dashboard** → Your Project → Settings → Environment Variables
 
-2. **Add these variables:**
+2. **Add these variables** (set for Production, Preview, and Development):
 
-| Variable | Value | Environment |
-|----------|-------|-------------|
-| `DB_URL` | `postgresql://neondb_owner:npg_gdYnelxC0p1F@ep-holy-hat-a1c9b1dv-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require` | Production, Preview, Development |
-| `JWT_SECRET` | `your_secure_jwt_secret_64_hex_chars` | Production, Preview, Development |
-| `NODE_ENV` | `production` | Production |
-| `CORS_ORIGIN` | `https://your-frontend-domain.vercel.app` | Production, Preview |
+#### Database Configuration:
+```bash
+# Variable Name: DB_URL
+# Value: Your complete Neon connection string (NO QUOTES in Vercel UI)
+# Example format:
+postgresql://neondb_owner:your_password@ep-example-123.region.aws.neon.tech:5432/neondb?sslmode=require
+```
 
-### ⚠️ Security Notes:
-- Never commit actual secrets to Git
-- Use different JWT secrets for different environments
-- Consider using Vercel's secret management for sensitive data
+#### JWT Secret:
+```bash
+# Variable Name: JWT_SECRET
+# Value: 64-character secure hex string (generate below)
+# Generate with: openssl rand -hex 64
+```
+
+#### Environment:
+```bash
+# Variable Name: NODE_ENV
+# Value: production
+```
+
+### 🔍 How to Get Your Neon DB_URL:
+
+1. **Log into Neon Console**: https://console.neon.tech/
+2. **Go to your project** → Dashboard
+3. **Copy connection string** from "Connection Details"
+4. **Ensure it includes**: `?sslmode=require` at the end
+
+### 🔐 Generate Secure JWT Secret:
+
+```bash
+# Option 1: Using OpenSSL
+openssl rand -hex 64
+
+# Option 2: Using Node.js
+node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
+
+# Option 3: Online (use with caution)
+# Visit: https://www.allkeysgenerator.com/Random/Security-Encryption-Key-Generator.aspx
+```
+
+### 📝 Setting Variables in Vercel UI:
+
+1. **In Vercel Dashboard**:
+   - Project Settings → Environment Variables → Add New
+
+2. **For each variable**:
+   ```
+   Name: DB_URL
+   Value: postgresql://your_connection_string_here (NO QUOTES)
+   Environments: ✅ Production ✅ Preview ✅ Development
+   ```
+
+3. **Important**:
+   - Don't add quotes around values in Vercel UI
+   - Select all environments (Production, Preview, Development)
+   - Click "Save" after adding each variable
+
+### ✅ Verify Configuration:
+
+After setting variables, check your deployment:
+
+```bash
+# Visit your health check endpoint:
+https://your-app.vercel.app/health
+
+# Should return:
+{
+  "status": "success",
+  "configuration": {
+    "db_url_configured": true,
+    "jwt_secret_configured": true
+  }
+```
+
+### 🚨 Common Issues:
+
+| Issue | Cause | Solution |
+|-------|--------|----------|
+| `DB_URL not configured` | Missing DB_URL variable | Add DB_URL in Vercel dashboard |
+| `ENOTFOUND` | Wrong hostname | Check Neon connection string |
+| `28P01` Authentication failed | Wrong credentials | Verify username/password in DB_URL |
+| Variables not available | Not set for all environments | Ensure variables are set for Production, Preview, Development |
+
+### 🔄 After Adding Variables:
+
+**Important**: Redeploy your application after adding environment variables:
+
+```bash
+# Trigger a new deployment
+git commit --allow-empty -m "trigger redeploy with env vars"
+git push origin main
+```
 
 ## 🚀 Deployment Methods
 
